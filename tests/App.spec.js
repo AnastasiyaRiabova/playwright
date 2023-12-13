@@ -1,29 +1,34 @@
 const { test, expect } = require("@playwright/test");
-const { email, password, negativPassword } = require("../user");
 
-test("Successful authorization", async ({page}) => {
-  await page.goto("https://netology.ru/?modal=sign_in");
-  await expect(page).toHaveURL("https://netology.ru/?modal=sign_in");
+const {email} = require('./user.js');
+const {password} = require('./user.js');
 
-  await page.locator('[placeholder="Email"]').click();
-  await page.locator('[placeholder="Email"]').fill(email);
-  await page.locator('[placeholder="Пароль"]').click();
-  await page.locator('[placeholder="Пароль"]').fill(password);
+test('successfulAuthorization', async ({ page }) => {
 
-  await page.locator('[data-testid="login-submit-btn"]').click();
-  await expect(page).toHaveURL("https://netology.ru/profile");
+  await page.goto('https://netology.ru/');
+  await page.getByRole('link', { name: 'Войти' }).click();
+  await page.getByPlaceholder('Email').click();
+  await page.getByPlaceholder('Email').fill(email);
+  await page.getByPlaceholder('Email').press('Enter');
+  await page.getByPlaceholder('Пароль').click();
+  await page.getByPlaceholder('Пароль').fill(password);
+  await page.getByTestId('login-submit-btn').click();
+
+  await expect(page).toHaveURL('https://netology.ru/profile');
+  await expect(page).toHaveTitle('Мои программы обучения');
+
 });
 
-test("Failed authorization", async ({page}) => {
-   await page.goto("https://netology.ru/?modal=sign_in");
-  await expect(page).toHaveURL("https://netology.ru/?modal=sign_in");
+test('unsuccessfulAuthorization', async ({ page }) => {
 
-  await page.locator('[placeholder="Email"]').click();
-  await page.locator('[placeholder="Email"]').fill(email);
-  await page.locator('[placeholder="Пароль"]').click();
-  await page.locator('[placeholder="Пароль"]').fill("1111");
+  await page.goto('https://netology.ru/');
+  await page.getByRole('link', { name: 'Войти' }).click();
+  await page.getByPlaceholder('Email').click();
+  await page.getByPlaceholder('Email').fill('vereten.o@yandex.ru');
+  await page.getByPlaceholder('Пароль').click();
+  await page.getByPlaceholder('Пароль').fill('5367');
+  await page.getByTestId('login-submit-btn').click();
 
-  await page.locator('[data-testid="login-submit-btn"]').click();
-  await expect(page).toHaveURL("https://netology.ru/?modal=sign_in");
+  await expect(page.getByTestId('login-error-hint')).toHaveText('Вы ввели неправильно логин или пароль');
 
 });
